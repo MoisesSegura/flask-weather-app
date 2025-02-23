@@ -32,7 +32,7 @@ def home():
 
     return render_template("index.html", weather=weather_data, city_image=city_image)
 
-# 🔹 Nueva ruta para autocompletar ciudades
+# Nueva ruta para autocompletar ciudades
 @app.route("/autocomplete")
 def autocomplete():
     query = request.args.get("q")
