@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather-app</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen flex items-center justify-center text-black bg-sky-700"
+      style="background-image: url('{{ city_image if city_image else "https://source.unsplash.com/1600x900/?landscape" }}'); background-size: cover; background-position: center;" >
+    <div class="w-full max-w-md p-6 bg-white bg-opacity-20 backdrop-blur-lg rounded-lg shadow-lg">
+        <h1 class="text-2xl font-bold text-center">Consulta el Clima</h1>
+
+        <form method="POST" class="mt-4 flex">
+            <input type="text" name="city" id="cityInput" placeholder="Ingresa una ciudad"
+                   class="w-full p-2 text-black rounded-l-lg focus:outline-none"
+                   list="citySuggestions">
+            <datalist id="citySuggestions"></datalist>
+
+            <button type="submit" class="bg-blue-700 px-4 rounded-r-lg hover:bg-blue-800 text-white">Buscar</button>
+        </form>
+
+        {% if weather %}
+        <div class="mt-6 text-center">
+            <h2 class="text-xl font-semibold">{{ weather.name }}, {{ weather.sys.country }}</h2>
+            <p class="text-lg">{{ weather.weather[0].description }}</p>
+            <p class="text-4xl font-bold">{{ weather.main.temp }}°C</p>
+            <p>Humedad: {{ weather.main.humidity }}% | Viento: {{ weather.wind.speed }} m/s</p>
+            <p>Sensación térmica: {{ weather.main.feels_like }}</p>
+            
+        </div>
+        {% endif %}
+    </div>
+
+    <script>
+        document.getElementById("cityInput").addEventListener("input", function () {
+            const query = this.value;
+            if (query.length < 2) return;  
+
+            fetch(`/autocomplete?q=${query}`)
+                .then(response => response.json())
+                .then(data => {
+                    const datalist = document.getElementById("citySuggestions");
+                    datalist.innerHTML = ""; // Limpiar opciones anteriores
+                    data.forEach(city => {
+                        const option = document.createElement("option");
+                        option.value = city;
+                        datalist.appendChild(option);
+                    });
+                })
+                .catch(error => console.error("Error en autocompletado:", error));
+        });
+    </script>
+
+</body>
+</html>
